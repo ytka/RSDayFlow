@@ -64,6 +64,17 @@
 
 @property (nonatomic, readwrite, weak) id<RSDFDatePickerViewDataSource> dataSource;
 
+///--------------------------------
+/// @name Initial Setup
+///--------------------------------
+
+/**
+ The initial date used to center the calendar view on the selected date
+ 
+ @discussion If set this arrange calendar to center on this date
+ */
+@property (nonatomic, strong) NSDate *initialDate;
+
 ///----------------------------
 /// @name Scrolling to the Date
 ///----------------------------
