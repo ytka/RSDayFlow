@@ -601,6 +601,40 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     }
 }
 
+- (void)configureCell:(RSDFDatePickerDayCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+  NSDate *firstDayInMonth = [self dateForFirstDayInSection:indexPath.section];
+  RSDFDatePickerDate firstDayPickerDate = [self pickerDateFromDate:firstDayInMonth];
+  NSUInteger weekday = [self reorderedWeekday:[self.calendar components:NSCalendarUnitWeekday fromDate:firstDayInMonth].weekday];
+  
+  NSDate *cellDate = [self.calendar dateByAddingComponents:((^{
+    NSDateComponents *dateComponents = [NSDateComponents new];
+    dateComponents.day = indexPath.item - weekday;
+    return dateComponents;
+  })()) toDate:firstDayInMonth options:0];
+  RSDFDatePickerDate cellPickerDate = [self pickerDateFromDate:cellDate];
+  
+  cell.date = cellPickerDate;
+  cell.dateLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)(cellPickerDate.day)];
+  
+  cell.notThisMonth = !((firstDayPickerDate.year == cellPickerDate.year) && (firstDayPickerDate.month == cellPickerDate.month));
+  if (!cell.isNotThisMonth) {
+    weekday = [self.calendar components:NSCalendarUnitWeekday fromDate:cellDate].weekday;
+    cell.dayOff = (weekday == 1) || (weekday == 7);
+    
+    if ([self.dataSource respondsToSelector:@selector(datePickerView:shouldMarkDate:)]) {
+      cell.marked = [self.dataSource datePickerView:self shouldMarkDate:cellDate];
+      
+      if (cell.marked && [self.dataSource respondsToSelector:@selector(datePickerView:isCompletedAllTasksOnDate:)]) {
+        cell.completed = [self.dataSource datePickerView:self isCompletedAllTasksOnDate:cellDate];
+      }
+    }
+    
+    cell.today = ([cellDate compare:_today] == NSOrderedSame) ? YES : NO;
+  }
+  
+  [cell setNeedsDisplay];
+}
+
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
@@ -616,39 +650,8 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 - (RSDFDatePickerDayCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     RSDFDatePickerDayCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:RSDFDatePickerViewDayCellIdentifier forIndexPath:indexPath];
-    
-    NSDate *firstDayInMonth = [self dateForFirstDayInSection:indexPath.section];
-    RSDFDatePickerDate firstDayPickerDate = [self pickerDateFromDate:firstDayInMonth];
-    NSUInteger weekday = [self reorderedWeekday:[self.calendar components:NSCalendarUnitWeekday fromDate:firstDayInMonth].weekday];
-    
-    NSDate *cellDate = [self.calendar dateByAddingComponents:((^{
-        NSDateComponents *dateComponents = [NSDateComponents new];
-        dateComponents.day = indexPath.item - weekday;
-        return dateComponents;
-    })()) toDate:firstDayInMonth options:0];
-    RSDFDatePickerDate cellPickerDate = [self pickerDateFromDate:cellDate];
-    
-    cell.date = cellPickerDate;
-    cell.dateLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)(cellPickerDate.day)];
-    
-    cell.notThisMonth = !((firstDayPickerDate.year == cellPickerDate.year) && (firstDayPickerDate.month == cellPickerDate.month));
-    if (!cell.isNotThisMonth) {
-        weekday = [self.calendar components:NSCalendarUnitWeekday fromDate:cellDate].weekday;
-        cell.dayOff = (weekday == 1) || (weekday == 7);
-        
-        if ([self.dataSource respondsToSelector:@selector(datePickerView:shouldMarkDate:)]) {
-            cell.marked = [self.dataSource datePickerView:self shouldMarkDate:cellDate];
-            
-            if (cell.marked && [self.dataSource respondsToSelector:@selector(datePickerView:isCompletedAllTasksOnDate:)]) {
-                cell.completed = [self.dataSource datePickerView:self isCompletedAllTasksOnDate:cellDate];
-            }
-        }
-        
-        cell.today = ([cellDate compare:_today] == NSOrderedSame) ? YES : NO;
-    }
-    
-    [cell setNeedsDisplay];
-    
+  
+    [self configureCell:cell atIndexPath:indexPath];
     return cell;
 }
 
@@ -696,32 +699,6 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 
 //	A native refactoring process might introduce duplicate state which is bad too.
 
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]).isNotThisMonth) {
-        return NO;
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(datePickerView:shouldHighlightDate:)]) {
-        RSDFDatePickerDayCell *cell = ((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]);
-        NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
-        return [self.delegate datePickerView:self shouldHighlightDate:date];
-    }
-    
-    return YES;
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    [cell setNeedsDisplay];
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    [cell setNeedsDisplay];
-}
 //- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath
 //{
 //    if (((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]).isNotThisMonth) {
@@ -773,6 +750,10 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     
     if ([self.delegate respondsToSelector:@selector(datePickerView:didSelectDate:)]) {
         [self.delegate datePickerView:self didSelectDate:date];
+    }
+  
+    if (cell != nil) {
+      [self configureCell:cell atIndexPath:indexPath];
     }
 }
 
