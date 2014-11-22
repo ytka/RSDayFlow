@@ -722,6 +722,32 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
     [cell setNeedsDisplay];
 }
+//- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    if (((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]).isNotThisMonth) {
+//        return NO;
+//    }
+//    
+//    if ([self.delegate respondsToSelector:@selector(datePickerView:shouldHighlightDate:)]) {
+//        RSDFDatePickerDayCell *cell = ((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]);
+//        NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
+//        return [self.delegate datePickerView:self shouldHighlightDate:date];
+//    }
+//    
+//    return YES;
+//}
+//
+//- (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+//    [cell setNeedsDisplay];
+//}
+//
+//- (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+//    [cell setNeedsDisplay];
+//}
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
