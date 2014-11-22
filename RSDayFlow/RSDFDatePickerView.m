@@ -101,7 +101,7 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     
     [super layoutSubviews];
     
-    self.collectionView.frame = [self collectionViewFrame];
+    self.collectionView.frame = self.bounds;
     if (!self.collectionView.superview) {
         [self addSubview:self.collectionView];
         
@@ -173,20 +173,10 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     return [RSDFDatePickerCollectionView class];
 }
 
-- (CGRect)collectionViewFrame
-{
-    CGFloat daysOfWeekViewHeight = CGRectGetHeight([self daysOfWeekViewFrame]);
-    
-    CGRect collectionViewFrame = self.bounds;
-    collectionViewFrame.origin.y += daysOfWeekViewHeight;
-    collectionViewFrame.size.height -= daysOfWeekViewHeight;
-    return collectionViewFrame;
-}
-
 - (RSDFDatePickerCollectionView *)collectionView
 {
     if (!_collectionView) {
-        _collectionView = [[[self collectionViewClass] alloc] initWithFrame:[self collectionViewFrame] collectionViewLayout:self.collectionViewLayout];
+        _collectionView = [[[self collectionViewClass] alloc] initWithFrame:self.bounds collectionViewLayout:self.collectionViewLayout];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
         [_collectionView registerClass:[self monthHeaderClass] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:RSDFDatePickerViewMonthHeaderIdentifier];
