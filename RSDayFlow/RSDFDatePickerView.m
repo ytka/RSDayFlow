@@ -722,10 +722,14 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     if (((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]).isNotThisMonth) {
         return NO;
     }
-    
+  
+    RSDFDatePickerDayCell *cell = ((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]);
+    NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
+    if (_endDate != nil && date != nil && ([_endDate compare:date] == NSOrderedAscending || [_endDate compare:date] == NSOrderedSame)) {
+      return NO;
+    }
+
     if ([self.delegate respondsToSelector:@selector(datePickerView:shouldSelectDate:)]) {
-        RSDFDatePickerDayCell *cell = ((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]);
-        NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
         return [self.delegate datePickerView:self shouldSelectDate:date];
     }
     
