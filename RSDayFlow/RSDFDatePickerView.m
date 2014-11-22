@@ -610,7 +610,6 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
   cell.notThisMonth = !((firstDayPickerDate.year == cellPickerDate.year) && (firstDayPickerDate.month == cellPickerDate.month));
   if (!cell.isNotThisMonth) {
     weekday = [self.calendar components:NSCalendarUnitWeekday fromDate:cellDate].weekday;
-    cell.dayOff = (weekday == 1) || (weekday == 7);
     
     if ([self.dataSource respondsToSelector:@selector(datePickerView:shouldMarkDate:)]) {
       cell.marked = [self.dataSource datePickerView:self shouldMarkDate:cellDate];
@@ -620,7 +619,10 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
       }
     }
     
-    cell.today = ([cellDate compare:_today] == NSOrderedSame) ? YES : NO;
+    NSComparisonResult todayComparedToCellDate = [cellDate compare:_today];
+    
+    cell.today = (todayComparedToCellDate == NSOrderedSame) ? YES : NO;
+    cell.dayOff = (_endDate == nil ? NO : (todayComparedToCellDate == NSOrderedDescending ? YES : NO));
   }
   
   [cell setNeedsDisplay];
