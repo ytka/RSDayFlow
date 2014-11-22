@@ -101,11 +101,6 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     
     [super layoutSubviews];
     
-    self.daysOfWeekView.frame = [self daysOfWeekViewFrame];
-    if (!self.daysOfWeekView.superview) {
-        [self addSubview:self.daysOfWeekView];
-    }
-    
     self.collectionView.frame = [self collectionViewFrame];
     if (!self.collectionView.superview) {
         [self addSubview:self.collectionView];
@@ -121,6 +116,11 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
         [self.collectionViewLayout invalidateLayout];
         [self.collectionViewLayout prepareLayout];
         self.collectionView.contentOffset = beforeLayoutSubviewsContentOffset;
+    }
+  
+    self.daysOfWeekView.frame = [self daysOfWeekViewFrame];
+    if (!self.daysOfWeekView.superview) {
+      [self addSubview:self.daysOfWeekView];
     }
 }
 
