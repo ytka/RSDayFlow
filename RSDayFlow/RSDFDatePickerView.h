@@ -122,6 +122,8 @@
  */
 - (void)reloadData;
 
+- (CGRect)daysOfWeekViewFrame;
+
 ///------------------------------------
 /// @name Accessing Classes of Subviews
 ///------------------------------------
