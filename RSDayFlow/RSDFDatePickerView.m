@@ -59,6 +59,7 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 @synthesize collectionView = _collectionView;
 @synthesize collectionViewLayout = _collectionViewLayout;
 @synthesize daysInWeek = _daysInWeek;
+@synthesize endDate = _endDate;
 
 #pragma mark - Lifecycle
 

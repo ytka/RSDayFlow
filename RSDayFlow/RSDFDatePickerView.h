@@ -75,6 +75,8 @@
  */
 @property (nonatomic, strong) NSDate *initialDate;
 
+@property (nonatomic, strong) NSDate *endDate;
+
 ///----------------------------
 /// @name Scrolling to the Date
 ///----------------------------
