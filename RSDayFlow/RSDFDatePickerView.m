@@ -248,19 +248,16 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     
     NSDateComponents *dateYearMonthComponents = [self.calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:date];
     NSDate *month = [self.calendar dateFromComponents:dateYearMonthComponents];
-    
+
+    NSDateComponents *toDateComponents = [self computeToDate:month];
     _fromDate = [self pickerDateFromDate:[self.calendar dateByAddingComponents:((^{
-        NSDateComponents *components = [NSDateComponents new];
-        components.month = -6;
-        return components;
+      NSDateComponents *components = [NSDateComponents new];
+      components.month = toDateComponents.month - 12;
+      return components;
     })()) toDate:month options:0]];
-    
-    _toDate = [self pickerDateFromDate:[self.calendar dateByAddingComponents:((^{
-        NSDateComponents *components = [NSDateComponents new];
-        components.month = 6;
-        return components;
-    })()) toDate:month options:0]];
-    
+    _toDate = [self pickerDateFromDate:[self.calendar dateByAddingComponents:toDateComponents toDate:month options:0]];
+
+  
     [cv reloadData];
     [cvLayout invalidateLayout];
     [cvLayout prepareLayout];
@@ -319,23 +316,39 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 
 #pragma mark - Private
 
+- (NSDateComponents *)computeToDate:(NSDate *)fromDate {
+  NSDateComponents *components = [NSDateComponents new];
+  
+  components.month = 6;
+  if (_endDate != nil) {
+    NSDate *newToDate = [self.calendar dateByAddingComponents:components toDate:fromDate options:0];
+    NSDateComponents *dateYearMonthComponents = [self.calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:_endDate];
+    NSDate *monthOfEndDate = [self.calendar dateFromComponents:dateYearMonthComponents];
+    
+    if ([newToDate compare:monthOfEndDate] == NSOrderedDescending) {
+      components = [self.calendar components:(NSCalendarUnitMonth) fromDate:fromDate toDate:monthOfEndDate options:0];
+      
+      if (++components.month < 0) {
+        components.month = 0;
+      }
+    }
+  }
+  
+  return components;
+}
+
 - (void)commonInitializer
 {
     NSDateComponents *nowYearMonthComponents = [self.calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:[NSDate date]];
     NSDate *now = [self.calendar dateFromComponents:nowYearMonthComponents];
     
     _fromDate = [self pickerDateFromDate:[self.calendar dateByAddingComponents:((^{
-        NSDateComponents *components = [NSDateComponents new];
-        components.month = -6;
-        return components;
+      NSDateComponents *components = [NSDateComponents new];
+      components.month = -6;
+      return components;
     })()) toDate:now options:0]];
-    
-    _toDate = [self pickerDateFromDate:[self.calendar dateByAddingComponents:((^{
-        NSDateComponents *components = [NSDateComponents new];
-        components.month = 6;
-        return components;
-    })()) toDate:now options:0]];
-    
+    _toDate = [self pickerDateFromDate:[self.calendar dateByAddingComponents:[self computeToDate:now] toDate:now options:0]];
+  
     NSDateComponents *todayYearMonthDayComponents = [self.calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay) fromDate:[NSDate date]];
     _today = [self.calendar dateFromComponents:todayYearMonthDayComponents];
     
@@ -356,11 +369,12 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 
 - (void)appendFutureDates
 {
-    [self shiftDatesByComponents:((^{
-        NSDateComponents *dateComponents = [NSDateComponents new];
-        dateComponents.month = 6;
-        return dateComponents;
-    })())];
+  NSDateComponents *components = [self computeToDate:[self dateFromPickerDate:self.toDate]];
+  
+  if (components.month < 1) {
+    return;
+  }
+  [self shiftDatesByComponents:components];
 }
 
 - (void)shiftDatesByComponents:(NSDateComponents *)components
