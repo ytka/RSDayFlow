@@ -741,7 +741,7 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
   
     RSDFDatePickerDayCell *cell = ((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]);
     NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
-    if (_endDate != nil && date != nil && ([_endDate compare:date] == NSOrderedAscending || [_endDate compare:date] == NSOrderedSame)) {
+    if (_endDate != nil && date != nil && [_endDate compare:date] == NSOrderedAscending) {
       return NO;
     }
 
