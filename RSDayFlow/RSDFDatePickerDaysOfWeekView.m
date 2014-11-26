@@ -38,6 +38,8 @@
 
 @implementation RSDFDatePickerDaysOfWeekView
 
+@synthesize daysOff = _daysOff;
+
 #pragma mark - Lifecycle
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -164,10 +166,11 @@
         weekdayLabel.textAlignment = NSTextAlignmentCenter;
         weekdayLabel.backgroundColor = dayOfWeekLabelBackgroundColor;
         weekdayLabel.font = dayOfWeekLabelFont;
-        if ([weekdaySymbols indexOfObjectIdenticalTo:weekdaySymbol] != 0 && [weekdaySymbols indexOfObjectIdenticalTo:weekdaySymbol] != 6) {
-            weekdayLabel.textColor = dayOfWeekLabelTextColor;
-        } else {
+        NSUInteger weekDayIndex = [weekdaySymbols indexOfObjectIdenticalTo:weekdaySymbol];
+        if (_daysOff != nil && [_daysOff containsObject:@(weekDayIndex + 1)]) {
             weekdayLabel.textColor = dayOffOfWeekLabelTextColor;
+        } else {
+            weekdayLabel.textColor = dayOfWeekLabelTextColor;
         }
         weekdayLabel.text = weekdaySymbol;
         [weekdayLabels addObject:weekdayLabel];

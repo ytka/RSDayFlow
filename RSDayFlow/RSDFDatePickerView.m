@@ -128,6 +128,11 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 
 #pragma mark - Custom Accessors
 
+- (void)setDaysOff:(NSSet *)daysOff {
+  _daysOff = daysOff;
+  [self.daysOfWeekView setDaysOff:daysOff];
+}
+
 - (NSCalendar *)calendar
 {
     if (!_calendar) {

@@ -30,6 +30,8 @@
  */
 @interface RSDFDatePickerDaysOfWeekView : UIView
 
+@property (nonatomic, strong) NSSet *daysOff;
+
 /**
  Designated initializer. Initializes and returns a newly allocated view object with the specified frame rectangle and the specified calendar.
  
