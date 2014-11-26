@@ -77,6 +77,8 @@
 
 @property (nonatomic, strong) NSDate *endDate;
 
+@property (nonatomic, strong) NSSet *daysOff;
+
 ///----------------------------
 /// @name Scrolling to the Date
 ///----------------------------

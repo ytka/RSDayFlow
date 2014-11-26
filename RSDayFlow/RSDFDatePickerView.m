@@ -60,6 +60,7 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 @synthesize collectionViewLayout = _collectionViewLayout;
 @synthesize daysInWeek = _daysInWeek;
 @synthesize endDate = _endDate;
+@synthesize daysOff = _daysOff;
 
 #pragma mark - Lifecycle
 
@@ -637,6 +638,10 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     
     cell.today = (todayComparedToCellDate == NSOrderedSame) ? YES : NO;
     cell.dayOff = (_endDate == nil ? NO : (todayComparedToCellDate == NSOrderedDescending ? YES : NO));
+    
+    if (cell.dayOff == NO && _daysOff && [_daysOff containsObject:@(weekday)]) {
+      cell.dayOff = YES;
+    }
   }
   
   [cell setNeedsDisplay];
@@ -740,12 +745,12 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
     }
   
     RSDFDatePickerDayCell *cell = ((RSDFDatePickerDayCell *)[collectionView cellForItemAtIndexPath:indexPath]);
-    NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
-    if (_endDate != nil && date != nil && [_endDate compare:date] == NSOrderedAscending) {
+    if (cell.dayOff == YES) {
       return NO;
     }
 
     if ([self.delegate respondsToSelector:@selector(datePickerView:shouldSelectDate:)]) {
+        NSDate *date = cell ? [self dateFromPickerDate:cell.date] : nil;
         return [self.delegate datePickerView:self shouldSelectDate:date];
     }
     
