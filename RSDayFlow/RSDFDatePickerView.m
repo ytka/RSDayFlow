@@ -587,7 +587,7 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
 - (void)scrollToTopOfSection:(NSInteger)section animated:(BOOL)animated
 {
 	CGRect headerRect = [self frameForHeaderForSection:section];
-	CGPoint topOfHeader = CGPointMake(0, headerRect.origin.y - _collectionView.contentInset.top);
+	CGPoint topOfHeader = CGPointMake(0, MIN(_collectionView.contentSize.height - _collectionView.frame.size.height, headerRect.origin.y - _collectionView.contentInset.top));
 	[_collectionView setContentOffset:topOfHeader animated:animated];
 }
 
