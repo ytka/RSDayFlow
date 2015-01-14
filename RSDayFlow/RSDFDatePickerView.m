@@ -691,8 +691,17 @@ static NSString * const RSDFDatePickerViewDayCellIdentifier = @"RSDFDatePickerVi
         
         monthHeader.date = date;
         
-        NSString *monthString = [dateFormatter shortStandaloneMonthSymbols][date.month - 1];
-        monthHeader.dateLabel.text = [[NSString stringWithFormat:@"%@ %lu", monthString, (unsigned long)(date.year)] uppercaseString];
+        dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+        dateFormatter.timeStyle  = NSDateFormatterNoStyle;
+        NSString *format = [dateFormatter dateFormat];
+        format = [format stringByReplacingOccurrencesOfString:@"d" withString:@""];
+        format = [format stringByReplacingOccurrencesOfString:@"," withString:@""];
+        if ([format hasSuffix:@"/"]) {
+            format = [format substringToIndex: format.length - 2];
+        }
+        [dateFormatter setDateFormat:format];
+        monthHeader.dateLabel.text = [dateFormatter stringFromDate:formattedDate];
+
         
         RSDFDatePickerDate today = [self pickerDateFromDate:_today];
         if ( (today.month == date.month) && (today.year == date.year) ) {
